@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkBreaks from 'remark-breaks'
 import { useFortuneAI } from '../../shared/Lib'
 import { Button, Loading, Textarea } from '../../shared/UI'
+import { FortuneSky } from './FortuneSky'
 import styles from './Home.module.css'
 
 export function Home() {
@@ -44,6 +45,7 @@ export function Home() {
 
   return (
     <main className={styles.page}>
+      <FortuneSky />
       <div className={styles.sky} aria-hidden="true">
         <Starfield />
       </div>
