@@ -1,0 +1,1 @@
+export { generateFortune } from './geminiClient'

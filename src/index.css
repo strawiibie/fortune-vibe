@@ -1,0 +1,40 @@
+:root {
+  --bg: #07060c;
+  --cream: #f4efe4;
+  --ink: #f6edd4;
+  --muted: #d9c7a4;
+  --placeholder: #9c907f;
+  --line: rgba(214, 176, 96, 0.55);
+  --gold: #e6c56a;
+  --gold-bright: #f8e7b0;
+  --display: 'Gowun Batang', 'Times New Roman', serif;
+  --heading: 'Cinzel', 'Gowun Batang', serif;
+  --sans: 'Hahmlet', 'Gowun Batang', serif;
+  color-scheme: dark;
+  font: 16px/1.7 var(--sans);
+  color: var(--ink);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+button,
+textarea {
+  font: inherit;
+}

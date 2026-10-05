@@ -1,0 +1,41 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.label {
+  color: var(--gold);
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 104px;
+  padding: 16px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--cream);
+  color: #3a3228;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.textarea::placeholder {
+  color: var(--placeholder);
+}
+
+.textarea:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.textarea:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
