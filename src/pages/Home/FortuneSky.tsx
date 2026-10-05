@@ -9,7 +9,11 @@ export function FortuneSky() {
     const mount = mountRef.current
     if (!mount) return
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      premultipliedAlpha: false,
+    })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setClearColor(0x000000, 0)
@@ -19,12 +23,14 @@ export function FortuneSky() {
     const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 80)
     camera.position.set(0, 0.2, 9)
 
-    const galaxy = createGalaxy(window.innerWidth < 700 ? 1400 : 2600)
-    galaxy.rotation.x = 1.05
-    galaxy.position.y = 0.6
-    scene.add(galaxy)
+    const galaxyTilt = new THREE.Group()
+    const galaxy = createGalaxy(window.innerWidth < 700 ? 1100 : 1900)
+    galaxyTilt.add(galaxy)
+    galaxyTilt.rotation.x = 0.95
+    galaxyTilt.position.set(0, 0.7, -1.2)
+    scene.add(galaxyTilt)
 
-    const dust = createDust(700)
+    const dust = createDust(420)
     scene.add(dust)
 
     const wheel = createWheel()
@@ -38,8 +44,7 @@ export function FortuneSky() {
     const render = () => {
       const elapsed = clock.getElapsedTime()
       if (!reduceMotion) {
-        galaxy.rotation.z = elapsed * 0.045
-        dust.rotation.y = elapsed * 0.012
+        galaxy.rotation.z = elapsed * 0.11
         wheel.rotation.z = elapsed * 0.16
       }
       renderer.render(scene, camera)
@@ -61,7 +66,7 @@ export function FortuneSky() {
     return () => {
       window.cancelAnimationFrame(frame)
       window.removeEventListener('resize', onResize)
-      disposeObject(galaxy)
+      disposeObject(galaxyTilt)
       disposeObject(dust)
       disposeObject(wheel)
       renderer.dispose()
@@ -73,40 +78,49 @@ export function FortuneSky() {
 }
 
 function createGalaxy(count: number) {
+  const galaxy = new THREE.Group()
+  galaxy.add(createSpiral(count, 0.034, 0.9))
+  galaxy.add(createSpiral(Math.floor(count * 0.1), 0.07, 1))
+  return galaxy
+}
+
+function createSpiral(count: number, size: number, opacity: number) {
   const positions = new Float32Array(count * 3)
   const colors = new Float32Array(count * 3)
+  const arms = 3
 
   for (let index = 0; index < count; index += 1) {
-    const radius = Math.pow(Math.random(), 0.7) * 7.2
-    const branch = index % 4
-    const spin = radius * 0.85
-    const angle = (branch / 4) * Math.PI * 2 + spin
-    const spread = 0.18 + radius * 0.08
+    const radius = Math.pow(Math.random(), 0.65) * 6.4
+    const branch = index % arms
+    const angle = (branch / arms) * Math.PI * 2 + radius * 0.55
+    const spread = Math.pow(Math.random(), 3) * (0.12 + radius * 0.09)
+    const drift = (Math.random() - 0.5) * spread
 
-    positions[index * 3] = Math.cos(angle) * radius + (Math.random() - 0.5) * spread
-    positions[index * 3 + 1] = (Math.random() - 0.5) * spread * 0.45
-    positions[index * 3 + 2] = Math.sin(angle) * radius + (Math.random() - 0.5) * spread
+    positions[index * 3] = Math.cos(angle) * radius + Math.cos(angle + Math.PI / 2) * drift
+    positions[index * 3 + 1] = (Math.random() - 0.5) * 0.16
+    positions[index * 3 + 2] = Math.sin(angle) * radius + Math.sin(angle + Math.PI / 2) * drift
 
-    const mix = Math.random()
-    colors[index * 3] = 0.72 + mix * 0.28
-    colors[index * 3 + 1] = 0.48 + mix * 0.28
-    colors[index * 3 + 2] = 0.95 - radius * 0.04
+    const warmth = 1 - radius / 6.4
+    colors[index * 3] = 0.72 + warmth * 0.28
+    colors[index * 3 + 1] = 0.48 + warmth * 0.32
+    colors[index * 3 + 2] = 0.95 - warmth * 0.2
   }
 
   const geometry = new THREE.BufferGeometry()
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 
-  const material = new THREE.PointsMaterial({
-    size: 0.028,
-    vertexColors: true,
-    transparent: true,
-    opacity: 0.9,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-  })
-
-  return new THREE.Points(geometry, material)
+  return new THREE.Points(
+    geometry,
+    new THREE.PointsMaterial({
+      size,
+      vertexColors: true,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  )
 }
 
 function createDust(count: number) {
